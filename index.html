@@ -3,98 +3,58 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portfolio - Nivesh</title>
-    <link rel="icon" href="profile.png" type="image/x-icon">
-    <link rel="stylesheet" href="styles.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/js/all.min.js"></script>
+    <title>NFC Reader</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        #output {
+            margin-top: 20px;
+            font-size: 18px;
+        }
+    </style>
 </head>
 <body>
-    <header>
-        <div class="container">
-            <div class="profile">
-                <img src="profile.png" alt="Nivesh" class="profile-img">
-                <h1 class="typing-effect">Nivesh</h1>
-                <p>2nd Year B.Tech CSE Student at Netaji Subhas University of Technology</p>
-            </div>
-            <!-- <nav>
-                <ul>
-                    <li><a href="#about">About</a></li>
-                    <li><a href="#projects">Projects</a></li>
-                    <li><a href="#skills">Skills</a></li>
-                    <li><a href="#contact">Contact</a></li>
-                </ul>
-            </nav> -->
-        </div>
-    </header>
+    <h1>Web NFC Reader</h1>
+    <button id="readNFC">Read NFC</button>
+    <div id="output"></div>
+    <script>
+        document.getElementById('readNFC').addEventListener('click', async () => {
+            if ('NDEFReader' in window) {
+                try {
+                    const ndef = new NDEFReader();
+                    await ndef.scan();
+                    console.log('NFC scan started.');
 
-    <section id="about">
-        <div class="container">
-            <h2>About Me</h2>
-            <p>I'm a passionate computer science student with an interest in programming and technology. I love working on creative projects and continuously expanding my knowledge in the field.</p>
-        </div>
-    </section>
+                    ndef.onreading = event => {
+                        const decoder = new TextDecoder();
+                        for (const record of event.message.records) {
+                            console.log('Record type:', record.recordType);
+                            console.log('MIME type:', record.mediaType);
+                            console.log('Data:', decoder.decode(record.data));
+                            document.getElementById('output').innerText = `Data: ${decoder.decode(record.data)}`;
+                        }
+                    };
 
-    <section id="projects">
-        <div class="container">
-            <h2>Projects</h2>
-            <div class="project">
-                <h3>Hand Tracking Visualization</h3>
-                <p>This project visualizes hand tracking using Pygame and OpenCV. It detects and tracks hands in real-time, displaying points and lines corresponding to hand landmarks.</p>
-                <video controls autoplay loop muted>
-                    <source src="hand_tracking_demo.mp4" type="video/mp4">
-                    Your browser does not support the video tag.
-                </video>
-            </div>
-        </div>
-    </section>
-
-    <section id="skills">
-        <div class="container">
-            <h2>Skills</h2>
-            <div class="skills-container">
-                <div class="skill">
-                    <i class="fab fa-python"></i>
-                    <p>Python</p>
-                </div>
-                <div class="skill">
-                    <i class="fab fa-js"></i>
-                    <p>JavaScript</p>
-                </div>
-                <div class="skill">
-                    <i class="fab fa-html5"></i>
-                    <p>HTML5</p>
-                </div>
-                <div class="skill">
-                    <i class="fab fa-css3-alt"></i>
-                    <p>CSS3</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section id="contact">
-        <div class="container">
-            <!-- <h2>Contact Me</h2> -->
-            <!-- <form id="contact-form">
-                <input type="text" placeholder="Name" required>
-                <input type="email" placeholder="Email" required>
-                <textarea placeholder="Message" required></textarea>
-                <button type="submit">Send Message</button>
-            </form> -->
-            <div class="social-links">
-                <a href="mailto:ghostrider810768@gmail.com"><i class="fas fa-envelope"></i></a>
-                <!-- <a href="https://www.linkedin.com/in/your-profile"><i class="fab fa-linkedin"></i></a> -->
-                <a href="https://github.com/Nivesh12345"><i class="fab fa-github"></i></a>
-            </div>
-        </div>
-    </section>
-
-    <footer>
-        <div class="container">
-            <p>&copy; 2024 Nivesh. All rights reserved.</p>
-        </div>
-    </footer>
-
-    <script src="script.js"></script>
+                    ndef.onreadingerror = () => {
+                        console.error('Error reading NFC tag.');
+                        document.getElementById('output').innerText = 'Error reading NFC tag.';
+                    };
+                } catch (error) {
+                    console.error('Error:', error);
+                    document.getElementById('output').innerText = `Error: ${error.message}`;
+                }
+            } else {
+                alert('Web NFC is not supported on this device.');
+            }
+        });
+    </script>
 </body>
 </html>
